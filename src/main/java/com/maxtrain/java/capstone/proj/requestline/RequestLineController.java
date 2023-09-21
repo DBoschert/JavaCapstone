@@ -32,19 +32,11 @@ import jakarta.transaction.Transactional;
 		private RequestLineRepository rlRepo;
 		@Autowired
 		private RequestRepository requestRepo;
+
 		
-		/*
 		
 		//  PRIVATE RecalculateRequestTotal(requestId)
-		// recalculate the total in request everytime PUT, POST, or DELETE is called
-		private void RecalculateRequestTotal(@PathVariable int requestId){
-			RequestLine total = rlRepo.RecalculateTotal(requestId);
-			();
-			
-		}
-		*/
-		
-		
+		// Recalculate the total in request everytime PUT, POST, or DELETE is called
 		@Transactional
 	    private void recalculateRequestTotal(int requestId) {
 	        double total = rlRepo.calculateTotal(requestId);
