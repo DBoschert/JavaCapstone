@@ -1,5 +1,9 @@
 package com.maxtrain.java.capstone.proj.Request;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.maxtrain.java.capstone.proj.requestline.RequestLine;
 import com.maxtrain.java.capstone.proj.user.User;
 
 import jakarta.persistence.Column;
@@ -9,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,6 +37,9 @@ public class Request {
 	@ManyToOne(optional=false)
 	@JoinColumn(name="userId")
 	private User user;
+	@JsonManagedReference // Json Ignore
+	@OneToMany(mappedBy = "request") // Json Ignore
+	private List<RequestLine> requestlines; // Json Ignore
 	
 	// Getters & Setters
 	
