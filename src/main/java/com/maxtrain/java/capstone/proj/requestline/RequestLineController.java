@@ -1,7 +1,8 @@
 package com.maxtrain.java.capstone.proj.requestline;
 
-import java.util.List;
+
 import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxtrain.java.capstone.proj.Request.Request;
+import com.maxtrain.java.capstone.proj.Request.RequestRepository;
+
+import jakarta.transaction.Transactional;
 
 	
 	@CrossOrigin
@@ -26,43 +30,34 @@ import com.maxtrain.java.capstone.proj.Request.Request;
 		
 		@Autowired
 		private RequestLineRepository rlRepo;
-		
-		
-		
+		@Autowired
+		private RequestRepository requestRepo;
 		
 		/*
-		 //Recalculate Request Total
-		  * 
-	private async Task RecalculateRequestTotal(int requestId)
-	{
-	     var total = (from rl in _context.RequestLines
-	                 join p in _context.Products
-	                    on rl.ProductId equals p.Id
-	                 where rl.RequestId == requestId
-	                 select new
-	                 {
-	                     LineTotal = rl.Quantity * p.Price
-	                 }).Sum(x => x.LineTotal);
-	                 
-	    var request = await _context.Requests.FindAsync(requestId);
-	    request!.Total = total;
-	    await _context.SaveChangesAsync();
-	} 
-		 
 		
 		//  PRIVATE RecalculateRequestTotal(requestId)
-		@SuppressWarnings("rawtypes")
-		private ResponseEntity RecalculateRequestTotal(@PathVariable int requestId, @RequestBody Request req){
-			List<RequestLine> reviews = rlRepo.RecalculateTotal(requestId);
-			double request = reviews.get(requestId);
-			req.setTotal(request);
-
+		// recalculate the total in request everytime PUT, POST, or DELETE is called
+		private void RecalculateRequestTotal(@PathVariable int requestId){
+			RequestLine total = rlRepo.RecalculateTotal(requestId);
+			();
 			
 		}
-		// recalculate the total in request everytime PUT, POST, or DELETE is called
+		*/
 		
-		 */
 		
+		@Transactional
+	    private void recalculateRequestTotal(int requestId) {
+	        double total = rlRepo.calculateTotal(requestId);
+	        Optional<Request> optionalRequest = requestRepo.findById(requestId);
+	        
+	        if (optionalRequest.isPresent()) {
+	            Request request = optionalRequest.get();
+	            request.setTotal(total);
+	            requestRepo.save(request);
+	        }
+	    }
+		
+		 
 		
 		
 		@GetMapping
@@ -92,20 +87,28 @@ import com.maxtrain.java.capstone.proj.Request.Request;
 		        if (rl.getId() != 0) {
 		            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		        }
+		        
 		        RequestLine savedRequestLine = rlRepo.save(rl);
+		        int requestId = savedRequestLine.getRequest().getId();
+		        recalculateRequestTotal(requestId);
 		        return new ResponseEntity<>(savedRequestLine, HttpStatus.CREATED); 
 		    } catch (Exception e) {
-		        e.printStackTrace(); // Log the exception for debugging
+		        e.printStackTrace(); 
 		        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		    }
 		}
+		
+		
 		@SuppressWarnings("rawtypes")
 		@PutMapping("{id}") 
 		public ResponseEntity PutRequestLine(@PathVariable int id, @RequestBody RequestLine rl) {
 			if(rl.getId() != id) {
 				return new ResponseEntity(HttpStatus.BAD_REQUEST);
 			}
+			int requestId = rl.getRequest().getId();
 			rlRepo.save(rl);
+			recalculateRequestTotal(requestId);
+			
 			return new ResponseEntity(HttpStatus.OK);
 		}
 		
@@ -116,7 +119,9 @@ import com.maxtrain.java.capstone.proj.Request.Request;
 			if(id <= 0) {
 				return new ResponseEntity(HttpStatus.BAD_REQUEST);
 			}
+			
 			rlRepo.deleteById(id);
+			recalculateRequestTotal(id);
 			return new ResponseEntity(HttpStatus.NO_CONTENT);
 		}
 	}
