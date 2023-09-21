@@ -1,7 +1,7 @@
 package com.maxtrain.java.capstone.proj.Request;
 
 import java.util.Optional;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 
 @CrossOrigin
@@ -45,6 +46,16 @@ public class RequestController {
 	}
 	
 	
+	// GET REVIEWS METHOD: GETS REQUESTS IN "REVIEW" BUT ISN'T OWNER BY THE USER WITH THE PRIMARY KEY
+	@GetMapping("reviews/{userId}")
+    public ResponseEntity<List<Request>> GetReviews(@PathVariable int userId) {
+        List<Request> reviews = reqRepo.findRequestByUserId(userId);
+        if (reviews.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
+    }
+	
 
 	
 	@PostMapping 
@@ -69,6 +80,35 @@ public class RequestController {
 		reqRepo.save(req);
 		return new ResponseEntity(HttpStatus.OK);
 	}
+	
+	// REVIEW METHOD: REVIEW OR APPROVED METHOD
+	@SuppressWarnings("rawtypes")
+	@PutMapping("review/{id}")
+	public ResponseEntity SetRequestStatusReview(@PathVariable int id, @RequestBody Request req) {
+		if(req.getTotal() <= 50) {
+			req.setStatus("APPROVED");
+			return PutRequest(id, req);
+		}
+		req.setStatus("REVIEW");
+		return PutRequest(id, req);
+	}
+	
+	// APPROVE METHOD: MAKE REQUEST STATUS APPROVED
+	@SuppressWarnings("rawtypes")
+	@PutMapping("approve/{id}")
+	public ResponseEntity SetRequestStatusApproved(@PathVariable int id, @RequestBody Request req) {
+		req.setStatus("APPROVED");
+		return PutRequest(id, req);
+	}
+	
+	// REJECT METHOD: MAKE REQUEST STATUS REJECTED
+	@SuppressWarnings("rawtypes")
+	@PutMapping("reject/{id}")
+	public ResponseEntity SetRequestStatusRejected(@PathVariable int id, @RequestBody Request req) {
+		req.setStatus("REJECTED");
+		return PutRequest(id, req);
+	}
+	
 	
 	
 	
