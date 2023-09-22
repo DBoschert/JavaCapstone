@@ -42,7 +42,7 @@ import jakarta.transaction.Transactional;
 	        double total = rlRepo.calculateTotal(requestId);
 	        Optional<Request> optionalRequest = requestRepo.findById(requestId);
 	        
-	        if (optionalRequest.isPresent()) {
+	        if (!optionalRequest.isEmpty()) {
 	            Request request = optionalRequest.get();
 	            request.setTotal(total);
 	            requestRepo.save(request);
@@ -111,7 +111,6 @@ import jakarta.transaction.Transactional;
 			if(id <= 0) {
 				return new ResponseEntity(HttpStatus.BAD_REQUEST);
 			}
-			
 			rlRepo.deleteById(id);
 			recalculateRequestTotal(id);
 			return new ResponseEntity(HttpStatus.NO_CONTENT);
