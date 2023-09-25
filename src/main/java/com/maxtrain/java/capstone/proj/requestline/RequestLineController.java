@@ -75,7 +75,6 @@ import jakarta.transaction.Transactional;
 		
 		@PostMapping 
 		public ResponseEntity<RequestLine> PostRequestLine(@RequestBody RequestLine rl) {
-		    try {
 		        if (rl.getId() != 0) {
 		            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		        }
@@ -84,10 +83,7 @@ import jakarta.transaction.Transactional;
 		        int requestId = savedRequestLine.getRequest().getId();
 		        recalculateRequestTotal(requestId);
 		        return new ResponseEntity<>(savedRequestLine, HttpStatus.CREATED); 
-		    } catch (Exception e) {
-		        e.printStackTrace(); 
-		        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		    }
+
 		}
 		
 		

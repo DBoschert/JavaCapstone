@@ -58,16 +58,11 @@ import org.springframework.web.bind.annotation.RestController;
 		
 		@PostMapping 
 		public ResponseEntity<User> PostUser(@RequestBody User user) {
-		    try {
 		        if (user.getId() != 0) {
 		            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		        }
 		        User savedUser = userRepo.save(user);
 		        return new ResponseEntity<>(savedUser, HttpStatus.CREATED); 
-		    } catch (Exception e) {
-		        e.printStackTrace(); // Log the exception for debugging
-		        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		    }
 		}
 		@SuppressWarnings("rawtypes")
 		@PutMapping("{id}") 

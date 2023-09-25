@@ -46,16 +46,12 @@ public class VendorController {
 	
 	@PostMapping 
 	public ResponseEntity<Vendor> PostVendor(@RequestBody Vendor vend) {
-	    try {
 	        if (vend.getId() != 0) {
 	            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	        }
 	        Vendor savedVendor = vendRepo.save(vend);
 	        return new ResponseEntity<>(savedVendor, HttpStatus.CREATED); 
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Log the exception for debugging
-	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
+
 	}
 	@SuppressWarnings("rawtypes")
 	@PutMapping("{id}") 
