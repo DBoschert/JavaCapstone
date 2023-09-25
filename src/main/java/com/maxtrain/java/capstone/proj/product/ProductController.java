@@ -47,16 +47,11 @@ public class ProductController {
 	
 	@PostMapping 
 	public ResponseEntity<Product> PostProduct(@RequestBody Product prod) {
-	    try {
 	        if (prod.getId() != 0) {
 	            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	        }
 	        Product savedProduct = prodRepo.save(prod);
 	        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED); 
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Log the exception for debugging
-	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
 	}
 	@SuppressWarnings("rawtypes")
 	@PutMapping("{id}") 

@@ -60,16 +60,11 @@ public class RequestController {
 	
 	@PostMapping 
 	public ResponseEntity<Request> PostRequest(@RequestBody Request req) {
-	    try {
 	        if (req.getId() != 0) {
 	            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	        }
 	        Request savedRequest = reqRepo.save(req);
 	        return new ResponseEntity<>(savedRequest, HttpStatus.CREATED); 
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Log the exception for debugging
-	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
 	}
 	@SuppressWarnings("rawtypes")
 	@PutMapping("{id}") 
